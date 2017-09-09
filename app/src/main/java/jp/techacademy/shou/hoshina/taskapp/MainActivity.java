@@ -132,17 +132,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void reloadListView(){
 
-        //Realmデータベースから、「すべてのデータを取得して新しい日時順に並べた結果を取得
-        //RealmResults<Task> taskRealmResults = mRealm.where(Task.class).findAllSorted("date", Sort.DESCENDING);
+        //絞込み条件を設定(カテゴリーで絞り込む)
         StringBuffer sbuf = new StringBuffer();
         sbuf.append("*");
         sbuf.append(mSearchEdittext.getText().toString());
         sbuf.append("*");
         String text = sbuf.toString();
 
+        //Realmデータベースから、「カテゴリーが絞込み条件に一致したもの」を取得して新しい日時順に並べた結果を取得
+        //*を使用しているので未記入の場合、すべての項目が表示される。
         RealmResults<Task> taskRealmResults = mRealm.where(Task.class)
                                                 .like("category", text)
-                                                .findAllSorted("category", Sort.DESCENDING);
+                                                .findAllSorted("date", Sort.DESCENDING);
 
         //上記の結果を、TaskListとしてセットする
         mTaskAdapter.setTaskList(mRealm.copyFromRealm(taskRealmResults));

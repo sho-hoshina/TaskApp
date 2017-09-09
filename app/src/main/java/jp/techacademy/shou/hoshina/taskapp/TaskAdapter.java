@@ -52,7 +52,7 @@ public class TaskAdapter extends BaseAdapter{
         TextView textView2 = (TextView)convertView.findViewById(android.R.id.text2);
 
         //後でTaskクラスから情報を取得するように変更する
-        textView1.setText(mTaskList.get(position).getTitle());
+        textView1.setText(mTaskList.get(position).getTitle()+"("+mTaskList.get(position).getTitle()+")");
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.JAPANESE);
         Date date = mTaskList.get(position).getDate();

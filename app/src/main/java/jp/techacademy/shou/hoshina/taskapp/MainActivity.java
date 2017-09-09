@@ -10,6 +10,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.Date;
@@ -31,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
+    private Button mSearchButton;
+    private EditText mSearchEdittext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        mSearchButton = (Button)findViewById(R.id.search_button);
+        mSearchButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                reloadListView();
+            }
+        });
+        mSearchEdittext = (EditText)findViewById(R.id.search_edit_text);
+
 
         //Realmの設定
         mRealm = Realm.getDefaultInstance();
@@ -119,7 +133,17 @@ public class MainActivity extends AppCompatActivity {
     private void reloadListView(){
 
         //Realmデータベースから、「すべてのデータを取得して新しい日時順に並べた結果を取得
-        RealmResults<Task> taskRealmResults = mRealm.where(Task.class).findAllSorted("date", Sort.DESCENDING);
+        //RealmResults<Task> taskRealmResults = mRealm.where(Task.class).findAllSorted("date", Sort.DESCENDING);
+        StringBuffer sbuf = new StringBuffer();
+        sbuf.append("*");
+        sbuf.append(mSearchEdittext.getText().toString());
+        sbuf.append("*");
+        String text = sbuf.toString();
+
+        RealmResults<Task> taskRealmResults = mRealm.where(Task.class)
+                                                .like("category", text)
+                                                .findAllSorted("category", Sort.DESCENDING);
+
         //上記の結果を、TaskListとしてセットする
         mTaskAdapter.setTaskList(mRealm.copyFromRealm(taskRealmResults));
         //TaskのListView用のアダプタに渡す

@@ -13,6 +13,7 @@ public class Task extends RealmObject implements Serializable{
     private String title;       //タイトル
     private String contents;   //内容
     private Date date;          //日時
+    private String category;   //カテゴリー
 
     //idをプライマリーキーとして設定
     @PrimaryKey
@@ -41,6 +42,15 @@ public class Task extends RealmObject implements Serializable{
     public void setDate(Date date){
         this.date = date;
     }
+
+    public String getCategory(){
+        return category;
+    }
+
+    public void setCategory(String category){
+        this.category = category;
+    }
+
 
     public int getId(){
         return id;

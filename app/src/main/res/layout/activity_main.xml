@@ -14,11 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/search_edit_text"
+    <Spinner
+        android:id="@+id/category_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="カテゴリー" />
+        android:layout_toStartOf="@+id/search_button"
+        android:layout_alignBottom="@+id/search_button"
+        android:layout_alignParentTop="true" />
 
     <Button
         android:id="@id/search_button"
@@ -31,7 +33,7 @@
         android:id="@+id/listView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/search_edit_text"/>
+        android:layout_below="@+id/category_spinner"/>
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton

@@ -8,11 +8,14 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.Date;
 
@@ -27,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private RealmChangeListener mRealmListener = new RealmChangeListener() {
         @Override
         public void onChange(Object element) {
+            reloadCategorySpinner();
             reloadListView();
         }
     };
@@ -34,7 +38,21 @@ public class MainActivity extends AppCompatActivity {
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
     private Button mSearchButton;
-    private EditText mSearchEdittext;
+    private Spinner mCategorySpinner;
+
+    // スピナーのアイテムが選択された時に呼び出されるコールバックリスナーを登録します
+    private AdapterView.OnItemSelectedListener mOnCategoryItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            Spinner spinner = (Spinner) parent;
+            // 選択されたアイテムを取得します
+            String item = (String) spinner.getSelectedItem();
+            Log.d("ANDROID", item);
+        }
+        @Override
+        public void onNothingSelected(AdapterView<?> arg0) {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
                 reloadListView();
             }
         });
-        mSearchEdittext = (EditText)findViewById(R.id.search_edit_text);
+        mCategorySpinner = (Spinner)findViewById(R.id.category_spinner);
+        mCategorySpinner.setOnItemSelectedListener(mOnCategoryItemSelectedListener);
+        reloadCategorySpinner();
 
 
         //Realmの設定
@@ -135,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         //絞込み条件を設定(カテゴリーで絞り込む)
         StringBuffer sbuf = new StringBuffer();
         sbuf.append("*");
-        sbuf.append(mSearchEdittext.getText().toString());
+        sbuf.append((String)mCategorySpinner.getSelectedItem());
         sbuf.append("*");
         String text = sbuf.toString();
 
@@ -151,6 +171,25 @@ public class MainActivity extends AppCompatActivity {
         mListView.setAdapter(mTaskAdapter);
         //表示を更新するために、アダプタにデータが変更されたことを知らせる。
         mTaskAdapter.notifyDataSetChanged();
+    }
+
+    private void reloadCategorySpinner(){
+        Realm realm = Realm.getDefaultInstance();
+
+        //Realmデータベースから、「カテゴリー」を取得して名前順に並べた結果を取得
+        RealmResults<Category> categoryRealmResults = realm.where(Category.class)
+                .findAllSorted("category", Sort.ASCENDING);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        //adapter.add("カテゴリー");   //新規作成時のコメント用
+        for(Category category : categoryRealmResults){
+            adapter.add(category.getCategory());
+            Log.d("ANDROID", String.format("ID: %s  Category: %s", category.getId(), category.getCategory()));
+        }
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mCategorySpinner.setAdapter(adapter);
+
+        realm.close();
     }
 
     @Override
